@@ -19,12 +19,12 @@ When using the app, the user is prompted with the choice to "add event" or "crea
 If the user chooses to create a file, the user will be able to enter a string of numbers that has two meanings. The user will write each of the jobs processing time and priority of the job. After entering these values into the file, the program will run and will output a graph that shows what order each job will be finished by. The graph will also show when each individual job will be finished.
 
 For example,
-5#0.2 /n
-6#0.1
-3#0.3
-9#0.2
-7#0.2
-12#0.5
+5#0.2 <br />
+6#0.1 <br />
+3#0.3<br />
+9#0.2<br />
+7#0.2<br />
+12#0.5<br />
 3#0.4
 
 If the user chooses to "add event", the user will be able to directly enter the job's processing time and priority of the event. 
