@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import './button.dart';
 import './testing.dart';
 import './control.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() => runApp(
       MultiProvider(
@@ -23,6 +25,11 @@ class _MyAppState extends State<MyApp> {
   var durationList = <int>[];
   var priorityList = <double>[];
   String outputString = '';
+  String finalResponse = '';
+  String deletedResponse = '';
+  final _formkey = GlobalKey<FormState>();
+  List<int> intOrder = [];
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -32,7 +39,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
-            title: Text('This is a demo'),
+            title: Text('Auto-Schedule App'),
           ),
           body: Column(
             children: [
@@ -40,8 +47,8 @@ class _MyAppState extends State<MyApp> {
                 controller: _durationctrl,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: 'Please Enter the Duration of Event',
-                  labelText: 'Event Duration',
+                  hintText: 'Please Enter the Procession Time of Event',
+                  labelText: 'Processing Time',
                 ),
                 keyboardType: TextInputType.number,
               ),
@@ -67,22 +74,56 @@ class _MyAppState extends State<MyApp> {
               ),
               RaisedButton(
                 onPressed: () {
+                  setState(() {
+                    durationList = [];
+                    priorityList = [];
+                  });
+                },
+                child: Text('Clear'),
+              ),
+              RaisedButton(
+                onPressed: () async {
                   for (int i = 0; i <= (durationList.length - 1); i++) {
                     outputString = outputString +
-                        priorityList.elementAt(i).toString() +
-                        '#' +
                         durationList.elementAt(i).toString() +
+                        '#' +
+                        priorityList.elementAt(i).toString() +
                         '\n';
                   }
-                  FileManager().writeTextFile(outputString);
-                  print(outputString);
-                  setState(() {});
+
+                  final url = 'http://10.0.2.2:5000/name';
+
+                  final response = await http.post(Uri.parse(url),
+                      body: json.encode({'name': outputString}));
                 },
                 child: Text('Create file'),
               ),
-              Text('Duration:' + durationList.toString()),
-              Text('Priority:' + priorityList.toString()),
+              RaisedButton(
+                onPressed: () async {
+                  final url = 'http://10.0.2.2:5000/name';
 
+                  final response = await http.get(Uri.parse(url));
+
+                  final decoded = json.decode(response.body);
+
+                  setState(() {
+                    finalResponse = decoded['name'];
+                  });
+                  deletedResponse =
+                      finalResponse.substring(0, finalResponse.length - 2);
+                  //Getting flowtime
+                  List<String> result = finalResponse.split(', ');
+                  result.removeLast();
+                  List<int> intOrder = result.map(int.parse).toList();
+
+                  setState(() {});
+                },
+                child: Text('Get Result'),
+              ),
+              Text('Processing Time:' + durationList.toString()),
+              Text('Priority:' + priorityList.toString()),
+              Text('Event should be executed in the order of: ' +
+                  deletedResponse),
               //AddButton(
               // _durationctrl, _durationList, _priorityctrl, _priorityList),
             ],
